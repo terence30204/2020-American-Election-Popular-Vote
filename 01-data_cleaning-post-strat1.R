@@ -1,13 +1,3 @@
-#### Preamble ####
-# Purpose: Prepare and clean the survey data downloaded from [...UPDATE ME!!!!!]
-# Author: Rohan Alexander and Sam Caetano [CHANGE THIS TO YOUR NAME!!!!]
-# Data: 22 October 2020
-# Contact: rohan.alexander@utoronto.ca [PROBABLY CHANGE THIS ALSO!!!!]
-# License: MIT
-# Pre-requisites: 
-# - Need to have downloaded the ACS data and saved it to inputs/data
-# - Don't forget to gitignore it!
-
 
 #### Workspace setup ####
 library(haven)
@@ -20,8 +10,7 @@ raw_data_post <- read_dta("usa_00003.dta.gz")
 # Add the labels
 raw_data_post <- labelled::to_factor(raw_data_post)
 
-# Just keep some variables that may be of interest (change 
-# this depending on your interests)
+
 reduced_data_post <- 
   raw_data_post %>% 
   select(region,
@@ -38,18 +27,11 @@ reduced_data_post <-
          inctot)
          
 
-#### What's next? ####
 
-## Here I am only splitting cells by age, but you 
-## can use other variables to split by changing
-## count(age) to count(age, sex, ....)
 
 reduced_data_post <- 
   reduced_data_post %>%
-  #count(region, stateicp, sex, age, race, hispan, marst, bpl, citizen, educd,
-        #labforce, inctot) %>%
-  #group_by(region, stateicp, sex, age, race, hispan, marst, bpl, citizen, educd,
-         #  labforce, inctot) 
+
   count(labforce, sex, race, hispan, stateicp, age) %>% 
   group_by(labforce, sex, race, hispan, stateicp, age)
 
@@ -101,37 +83,11 @@ reduced_data_post <-
     race_ethnicity == "three or more major races" ~ "Other"
   ))
 
-#cleanse the state and age observations
 
-
-#  filter(age != "less than 1 year old") %>%
-#  filter(age != "90 (90+ in 1980 and 1990)") %>% 
-#  filter(age != 2) %>% 
-#  filter(age != 3) %>% 
-#  filter(age != 4) %>% 
-#  filter(age != 5) %>%
-#  filter(age != 6) %>% 
-#  filter(age != 7) %>% 
-#  filter(age != 8) %>% 
-#  filter(age != 9) %>% 
-#  filter(age != 10) %>% 
-#  filter(age != 11) %>% 
-#  filter(age != 12) %>% 
-#  filter(age != 13) %>% 
-#  filter(age != 14) %>% 
-#  filter(age != 15) %>% 
-#  filter(age != 16) %>% 
-#  filter(age != 17) %>% 
-#  filter(age != 18) %>%
-#  filter(age != 94) %>% 
-#  filter(age != 95) %>% 
-#  filter(age != 96) %>% 
-#  filter(age != 97) %>% 
   
 reduced_data_post$age <- as.integer(reduced_data_post$age)
 
-# Saving the census data as a csv file in my
-# working directory
+
 write_csv(reduced_data_post, "census_data.csv")
 
 
