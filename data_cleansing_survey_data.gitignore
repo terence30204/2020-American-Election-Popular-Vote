@@ -1,0 +1,152 @@
+#### Workspace setup ####
+library(haven)
+library(tidyverse)
+setwd("C:/Users/teren/Documents/University of Toronto/Fifth Year/STA304/PS3")
+
+raw_data <- read_dta("ns20200625.dta")
+
+raw_data <- labelled::to_factor(raw_data)
+
+reduced_data <- 
+  raw_data %>% 
+  select(interest,
+         registration,
+         vote_2016,
+         vote_intention,
+         vote_2020,
+         ideo5,
+         employment,
+         foreign_born,
+         gender,
+         census_region,
+         hispanic,
+         race_ethnicity,
+         household_income,
+         education,
+         state,
+         congress_district,
+         age)
+
+
+
+reduced_data<-
+  reduced_data %>%
+  mutate(vote_trump = 
+           ifelse(vote_2020 == "Donald Trump", 1, 0))
+reduced_data <-   
+  reduced_data %>%
+  mutate(vote_biden = 
+           ifelse(vote_2020 == "Joe Biden", 1, 0))
+
+reduced_data <- 
+  reduced_data %>% 
+  mutate(employment = case_when( 
+    employment == "Full-time employed" ~ "Yes",
+    employment == "Homemaker" ~ "No",
+    employment == "Retired" ~ "No",
+    employment == "Unemployed or temporarily on layoff" ~ "No",
+    employment == "Part-time employed" ~ "Yes",
+    employment == "Permanently disabled" ~ "No",
+    employment == "Student" ~ "No",
+    employment == "Self-employed" ~ "Yes",
+    employment == "Other" ~ "No"))
+
+reduced_data <-
+  reduced_data %>% 
+  mutate(hispanic = case_when(
+    hispanic == "Argentinian" ~ "Other",
+    hispanic == "Colombian" ~ "Other",
+    hispanic == "Ecuadorian" ~ "Other",
+    hispanic == "Salvadorean" ~ "Other",
+    hispanic == "Guatemalan" ~ "Other",
+    hispanic == "Nicaraguan" ~ "Other",
+    hispanic == "Panamanian" ~ "Other",
+    hispanic == "Peruvian" ~ "Other",
+    hispanic == "Spanish" ~ "Other",
+    hispanic == "Venezuelan" ~ "Other",
+    hispanic == "Other Hispanic" ~ "Other",
+    hispanic == "Not Hispanic" ~ "Not Hispanic",
+    hispanic == "Mexican" ~ "Mexican",
+    hispanic == "Cuban" ~ "Cuban",
+    hispanic == "Puerto Rican" ~ "Puerto Rican"))
+
+reduced_data <- 
+  reduced_data %>% 
+  mutate(race_ethnicity = case_when(
+    race_ethnicity == "White" ~ "White",
+    race_ethnicity == 
+      "Black, or African American" ~ "Black, or African American",
+    race_ethnicity == "American Indian or Alaska Native" ~ "Native American",
+    race_ethnicity == "Asian (Asian Indian)" ~ "Asian",
+    race_ethnicity == "Asian (Chinese)" ~ "Asian",
+    race_ethnicity == "Asian (Filipino)" ~ "Asian",
+    race_ethnicity == "Asian (Japanese)" ~ "Asian", 
+    race_ethnicity == "Asian (Korean)" ~ "Asian",
+    race_ethnicity == "Asian (Vietnamese)" ~ "Asian",
+    race_ethnicity == "Asian (Other)" ~ "Asian",
+    race_ethnicity == "Pacific Islander (Native Hawaiian)" ~ "Pacific Islander",
+    race_ethnicity == "Pacific Islander (Guamanian)" ~ "Pacific Islander",
+    race_ethnicity == "Pacific Islander (Samoan)" ~ "Pacific Islander",
+    race_ethnicity == "Pacific Islander (Other)" ~ "Pacific Islander",
+    race_ethnicity == "Some other race" ~ "Other"
+  ))
+
+reduced_data <-
+  reduced_data %>% 
+  mutate(state = case_when(
+    state == "AK" ~ "alaska",
+    state == "AL" ~ "alabama",
+    state == "AR" ~ "arkansas",
+    state == "AZ" ~ "arizona",
+    state == "CA" ~ "california",
+    state == "CO" ~ "colorado",
+    state == "CT" ~ "connecticut",
+    state == "DC" ~ "district of columbia",
+    state == "DE" ~ "delaware",
+    state == "FL" ~ "florida",
+    state == "GA" ~ "georgia",
+    state == "HI" ~ "hawaii",
+    state == "IA" ~ "iowa",
+    state == "ID" ~ "idaho",
+    state == "IL" ~ "illinois",
+    state == "IN" ~ "indiana",
+    state == "KS" ~ "kansas",
+    state == "KY" ~ "kentucky",
+    state == "LA" ~ "louisiana",
+    state == "MA" ~ "massachusetts",
+    state == "MD" ~ "maryland",
+    state == "ME" ~ "maine",
+    state == "MI" ~ "michigan",
+    state == "MN" ~ "minnesota",
+    state == "MO" ~ "missouri",
+    state == "MS" ~ "mississippi",
+    state == "MT" ~ "montana",
+    state == "NC" ~ "north carolina",
+    state == "ND" ~ "north dakota",
+    state == "NE" ~ "nebraska",
+    state == "NH" ~ "new hampshire",
+    state == "NJ" ~ "new jersey",
+    state == "NM" ~ "new mexico",
+    state == "NV" ~ "nevada",
+    state == "NY" ~ "new york",
+    state == "OH" ~ "ohio",
+    state == "OK" ~ "oklahoma",
+    state == "OR" ~ "oregon",
+    state == "PA" ~ "pennsylvania",
+    state == "RI" ~ "rhode island",
+    state == "SC" ~ "south carolina",
+    state == "SD" ~ "south dakota",
+    state == "TN" ~ "tennessee",
+    state == "TX" ~ "texas",
+    state == "UT" ~ "utah",
+    state == "VA" ~ "virginia",
+    state == "VT" ~ "vermont",
+    state == "WA" ~ "washington",
+    state == "WI" ~ "wisconsin",
+    state == "WV" ~ "west virginia",
+    state == "WY" ~ "wyoming"
+  ))
+
+
+write_csv(reduced_data, "survey_data.csv")
+
