@@ -1,0 +1,176 @@
+---
+title: "Problem Set 3 Code"
+author: "Terence Chan"
+date: "November 2, 2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
+                      error = FALSE)
+```
+
+``` {r}
+library(tidyverse)
+library(ggplot2)
+survey_data <- read.csv("survey_data.csv")
+census_data <- read.csv("census_data.csv")
+```
+
+## Models
+
+```{r}
+#models to predict trump popular vote
+
+mod1 <- glm(vote_trump ~ employment + gender +  hispanic + race_ethnicity 
+            +  state + age, data = survey_data, family = "binomial") 
+summary(mod1) 
+
+mod2 <- glm(vote_trump ~ gender + hispanic + race_ethnicity + state
+            + age, data = survey_data, family = "binomial")
+summary(mod2)
+
+mod3 <- glm(vote_trump ~ state + race_ethnicity + hispanic + age, 
+            data = survey_data, family = "binomial")
+summary(mod3)
+
+mod4 <- glm(vote_trump ~ race_ethnicity + hispanic + age, data = survey_data, 
+            family = "binomial")
+summary(mod4)
+
+mod5 <- glm(vote_trump ~ race_ethnicity, data = survey_data, family = "binomial")
+summary(mod5)
+
+mod6 <- glm(vote_trump ~ age, data = survey_data, family = "binomial")
+summary(mod6)
+```
+
+## Post-Stratification (for trump popular vote)
+
+```{r}
+census_data$logodds_estimate <-
+  mod4 %>%
+  predict(newdata = census_data)
+
+census_data$estimate <-
+  exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+
+census_data %>%
+  mutate(alp_predict_prop = estimate*n) %>%
+  group_by(race_ethnicity) %>% 
+  summarise(alp_predict = sum(alp_predict_prop)/sum(n))
+## 27% avg for popular vote
+```
+
+
+## standard deviation calculation (for trump popular vote)
+
+```{r}
+m1 <- (0.250 + 0.093 + 0.377 + 0.272 + 0.213 + 0.444)/6
+v1 <- ((0.250-m1)^2 + (0.093-m1)^2 + (0.377-m1)^2 + (0.272-m1)^2 + (0.213-m1)^2 
+       + (0.444-m1)^2)/5
+s1 <- sqrt(v1)
+```
+
+
+
+```{r}
+#models to predict biden popular vote
+
+mod7 <- glm(vote_biden ~ race_ethnicity + hispanic + age, data = survey_data, 
+            family = "binomial")
+summary(mod7) 
+
+```
+
+
+
+## Post-Stratification (for biden popular vote)
+
+```{r}
+census_data$logodds_estimate <-
+  mod7 %>%
+  predict(newdata = census_data)
+
+census_data$estimate <-
+  exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+
+census_data %>%
+  mutate(alp_predict_prop = estimate*n) %>%
+  group_by(race_ethnicity) %>% 
+  summarise(alp_predict = sum(alp_predict_prop)/sum(n))
+##48% avg popular vote
+```
+
+## standard deviation calculation (for biden popular vote)
+
+```{r}
+m2 <- (0.514 + 0.663 + 0.288 + 0.422 + 0.612 + 0.371)/6
+v2 <- ((0.514-m2)^2 + (0.663-m2)^2 + (0.288-m2)^2 + (0.422-m2)^2 + (0.612-m2)^2 
+       + (0.371-m2)^2)/5
+s2 <- sqrt(v2)
+```
+
+
+
+## Plots
+
+```{r}
+mod4 %>% 
+  ggplot(aes(x = race_ethnicity, y = vote_trump)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(label = abbreviate) + 
+  labs(x = "Ethnic Group: Asin = Asian, BoAA = Black or African American, 
+       NtvA = Native American, Othr = Other, Pcfl = Pacific Islander, 
+       Whit = White", y = "Number of Voters", 
+       title = "Distribution of Ethnic Groups that will vote for Trump", 
+       caption = "Figure 1")
+  
+
+mod7 %>% 
+  ggplot(aes(x = race_ethnicity, y = vote_biden)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(label = abbreviate) + 
+  labs(x = "Ethnic Group: Asin = Asian, BoAA = Black or African American, 
+       NtvA = Native American, Othr = Other, Pcfl = Pacific Islander, 
+       Whit = White", y = "Number of Voters",
+       title = "Distribution of Ethnic Groups that will vote for Biden", 
+       caption = "Figure 2")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
