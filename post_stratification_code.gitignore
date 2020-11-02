@@ -1,0 +1,28 @@
+## Post-Stratification (for trump popular vote)
+
+```{r}
+census_data$logodds_estimate <-
+  mod4 %>%
+  predict(newdata = census_data)
+census_data$estimate <-
+  exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+census_data %>%
+  mutate(alp_predict_prop = estimate*n) %>%
+  group_by(race_ethnicity) %>% 
+  summarise(alp_predict = sum(alp_predict_prop)/sum(n))
+## 27% avg for popular vote
+
+## Post-Stratification (for biden popular vote)
+
+```{r}
+census_data$logodds_estimate <-
+  mod7 %>%
+  predict(newdata = census_data)
+census_data$estimate <-
+  exp(census_data$logodds_estimate)/(1+exp(census_data$logodds_estimate))
+census_data %>%
+  mutate(alp_predict_prop = estimate*n) %>%
+  group_by(race_ethnicity) %>% 
+  summarise(alp_predict = sum(alp_predict_prop)/sum(n))
+##48% avg popular vote
+```
