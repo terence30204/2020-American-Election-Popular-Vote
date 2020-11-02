@@ -1,9 +1,4 @@
----
-title: "Problem Set 3 Code"
-author: "Terence Chan"
-date: "November 2, 2020"
-output: pdf_document
----
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, 
